@@ -1,0 +1,423 @@
+--- 0x0A2B ---
+; Function at $0A2B - Main handler/dispatcher
+0A2B: F0 B5        PUSH AF
+0A2D: CB 7F        BIT 7,A          ; Test bit 7 of A
+0A2F: 28 0E        JR Z,$0A3F       ; Jump if bit 7 = 0
+
+; Bit 7 = 1 path
+0A31: 2A 12 13     LDI A,(HL)       ; Load from HL to A, increment HL, decrement BC
+0A34: 01 01 00     LD BC,$0001      ; BC = 1
+0A37: CD 14 0C     CALL $0C14       ; Call subroutine at $0C14
+0A3A: CD 00 0C     CALL $0C00       ; Call subroutine at $0C00
+0A3D: 18 DC        JR $0A1B         ; Jump to $0A1B
+
+; Bit 7 = 0 path
+0A3F: CD 00 0C     CALL $0C00       ; Call subroutine at $0C00
+
+; Another handler
+0A42: F0 B5        PUSH AF
+0A44: CB 7F        BIT 7,A
+0A46: 28 5A        JR Z,$0AA2       ; Jump if bit 7 = 0
+0A48: CD FB 0B     CALL $0BFB       ; Call subroutine at $0BFB
+0A4B: CD 00 0C     CALL $0C00       ; Call subroutine at $0C00
+
+; Another handler
+0A4E: F0 B5        PUSH AF
+0A50: CB 7F        BIT 7,A
+0A52: C2 3B 0B     JP NZ,$0B3B      ; Jump if bit 7 = 1 to $0B3B
+0A55: 79           LD A,C
+0A56: FE 00        CP $00
+0A58: 28 03        JR Z,$0A5D
+0A5A: C3 12 0B     JP $0B12
+0A5D: CD 00 0C     CALL $0C00
+
+; Another handler
+0A60: F0 B5        PUSH AF
+0A62: CB 7F        BIT 7,A
+0A64: 20 07        JR NZ,$0A6D      ; Jump if bit 7 = 1
+0A66: 3E 01        LD A,$01
+0A68: 80           ADD A,B
+0A69: 47           LD B,A
+0A6A: C3 14 0B     JP $0B14
+0A6D: CD 00 0C     CALL $0C00
+
+; Another handler
+0A70: F0 B5        PUSH AF
+0A72: CB 7F        BIT 7,A
+0A74: 20 1E        JR NZ,$0A94      ; Jump if bit 7 = 1
+0A76: CD FB 0B     CALL $0BFB
+0A79: CD 00 0C     CALL $0C00
+0A7C: CD 2A 0C     CALL $0C2A
+0A7F: CD 14 0C     CALL $0C14
+0A82: E5           PUSH HL
+0A83: F0 B7        LD A,[$FF00+$B7] ; Load from HRAM
+0A85: 6F           LD L,A
+0A86: 7D           LD A,L
+0A87: 12           LD (DE),A        ; Store A at DE
+0A88: 13           INC DE
+0A89: 0B           DEC BC
+0A8A: 79           LD A,C
+0A8B: B0           OR B             ; Test if BC = 0
+0A8C: 20 F8        JR NZ,$0A86      ; Loop if BC != 0
+0A8E: E1           POP HL
+0A8F: CD 00 0C     CALL $0C00
+0A92: 18 97        JR $0A2B         ; Jump back to start
+
+; Bit 7 = 1 path
+0A94: CD FB 0B     CALL $0BFB
+0A97: CD 00 0C     CALL $0C00
+0A9A: 06 00        LD B,$00
+0A9C: 3E 14        LD A,$14
+0A9E: 81           ADD A,C
+0A9F: 4F           LD C,A
+0AA0: 3E 00        LD A,$00
+0AA2: 88           ADC A,B
+0AA3: 47           LD B,A
+0AA4: CD 14 0C     CALL $0C14
+0AA7: 2A 12 13     LDI A,(HL)       ; Load from HL to A, increment HL, decrement BC
+0AAA: 0B           DEC BC
+0AAB: 79           LD A,C
+0AAC: B0           OR B             ; Test if BC = 0
+0AAD: 20 F8        JR NZ,$0AA7      ; Loop if BC != 0
+0AAF: C3 1B 0A     JP $0A1B
+
+; Another function
+0AB2: CD FB 0B     CALL $0BFB
+0AB5: CD 00 0C     CALL $0C00
+
+; Another handler
+0AB8: F0 B5        PUSH AF
+0ABA: CB 7F        BIT 7,A
+0ABC: 28 2C        JR Z,$0AEA       ; Jump if bit 7 = 0
+0ABE: CD 00 0C     CALL $0C00
+0AC1: 06 00        LD B,$00
+
+; Another handler
+0AC3: F0 B5        PUSH AF
+0AC5: CB 7F        BIT 7,A
+0AC7: 28 04        JR Z,$0ACD       ; Jump if bit 7 = 0
+0AC9: 3E 04        LD A,$04
+0ACB: 80           ADD A,B
+0ACC: 47           LD B,A
+0ACD: CD 00 0C     CALL $0C00
+
+; Another handler
+0AD0: F0 B5        PUSH AF
+0AD2: CB 7F        BIT 7,A
+0AD4: 28 04        JR Z,$0ADA       ; Jump if bit 7 = 0
+0AD6: 3E 02        LD A,$02
+0AD8: 80           ADD A,B
+0AD9: 47           LD B,A
+0ADA: CD 00 0C     CALL $0C00
+
+; Another handler
+0ADD: F0 B5        PUSH AF
+0ADF: CB 7F        BIT 7,A
+0AE1: 28 04        JR Z,$0AE7       ; Jump if bit 7 = 0
+0AE3: 3E 01        LD A,$01
+0AE5: 80           ADD A,B
+0AE6: 47           LD B,A
+0AE7: 04           INC B
+0AE8: 18 07        JR $0AF1
+
+0AEA: 79           LD A,C
+0AEB: FE 00        CP $00
+0AED: 28 1C        JR Z,$0B0B
+0AEF: 06 00        LD B,$00
+
+0AF1: E5           PUSH HL
+0AF2: 7B           LD A,E
+0AF3: 91           SUB C
+0AF4: 6F           LD L,A
+0AF5: 7A           LD A,D
+0AF6: 98           SBC B
+0AF7: 67           LD H,A
+0AF8: 2A 12 13     LDI A,(HL)       ; Load from HL to A, increment HL, decrement BC
+0AFB: 7E           LD A,(HL)
+0AFC: 12           LD (DE),A
+0AFD: 13           INC DE
+0AFE: 01 02 00     LD BC,$0002
+0B01: CD 14 0C     CALL $0C14
+0B04: E1           POP HL
+0B05: CD 00 0C     CALL $0C00
+0B08: C3 1B 0A     JP $0A1B
+
+0B0B: CD 00 0C     CALL $0C00
+0B0E: CD 2A 0C     CALL $0C2A
+0B11: CD 14 0C     CALL $0C14
+0B14: AF           XOR A            ; A = 0
+0B15: 12           LD (DE),A        ; Store 0 at DE
+0B16: 13           INC DE
+0B17: 0B           DEC BC
+0B18: 79           LD A,C
+0B19: B0           OR B             ; Test if BC = 0
+0B1A: 20 F8        JR NZ,$0B14      ; Loop if BC != 0
+0B1C: CD 00 0C     CALL $0C00
+0B1F: C3 1B 0A     JP $0A1B
+
+; Another function
+0B22: 06 00        LD B,$00
+0B24: CD 00 0C     CALL $0C00
+0B27: C5           PUSH BC
+0B28: CD 2A 0C     CALL $0C2A
+0B2B: CD 14 0C     CALL $0C14
+0B2E: C1           POP BC
+0B2F: E5           PUSH HL
+0B30: 7B           LD A,E
+0B31: 91           SUB C
+0B32: 6F           LD L,A
+0B33: 7A           LD A,D
+0B34: 98           SBC B
+0B35: 67           LD H,A
+0B36: F0 B8        LD A,[$FF00+$B8] ; Load from HRAM
+0B38: 4F           LD C,A
+0B39: F0 B9        LD A,[$FF00+$B9] ; Load from HRAM
+0B3B: 47           LD B,A
+0B3C: 2A 12 13     LDI A,(HL)       ; Load from HL to A, increment HL, decrement BC
+0B3F: 0B           DEC BC
+0B40: 79           LD A,C
+0B41: B0           OR B             ; Test if BC = 0
+0B42: 20 F8        JR NZ,$0B3C      ; Loop if BC != 0
+0B44: E1           POP HL
+0B45: CD 00 0C     CALL $0C00
+0B48: C3 1B 0A     JP $0A1B
+
+; Another handler
+0B4B: CD 00 0C     CALL $0C00
+0B4E: 06 00        LD B,$00
+
+; Bit test handlers with different values
+0B50: F0 B5        PUSH AF
+0B52: CB 7F        BIT 7,A
+0B54: 28 04        JR Z,$0B5A       ; Jump if bit 7 = 0
+0B56: 3E 01        LD A,$01
+0B58: 80           ADD A,B
+0B59: 47           LD B,A
+0B5A: CD 00 0C     CALL $0C00
+
+0B5D: F0 B5        PUSH AF
+0B5F: CB 7F        BIT 7,A
+0B61: 20 07        JR NZ,$0B6A      ; Jump if bit 7 = 1
+0B63: 3E 01        LD A,$01
+0B65: 80           ADD A,B
+0B66: 47           LD B,A
+0B67: C3 14 0B     JP $0B14
+0B6A: CD 00 0C     CALL $0C00
+0B6D: CB 20        SLA B            ; Shift B left arithmetic
+
+0B6F: F0 B5        PUSH AF
+0B71: CB 7F        BIT 7,A
+0B73: 28 04        JR Z,$0B79       ; Jump if bit 7 = 0
+0B75: 3E 01        LD A,$01
+0B77: 80           ADD A,B
+0B78: 47           LD B,A
+0B79: CD 00 0C     CALL $0C00
+
+0B7C: F0 B5        PUSH AF
+0B7E: CB 7F        BIT 7,A
+0B80: 20 07        JR NZ,$0B89      ; Jump if bit 7 = 1
+0B82: 3E 03        LD A,$03
+0B84: 80           ADD A,B
+0B85: 47           LD B,A
+0B86: C3 14 0B     JP $0B14
+0B89: CD 00 0C     CALL $0C00
+0B8C: CB 20        SLA B            ; Shift B left arithmetic
+
+0B8E: F0 B5        PUSH AF
+0B90: CB 7F        BIT 7,A
+0B92: 28 04        JR Z,$0B98       ; Jump if bit 7 = 0
+0B94: 3E 01        LD A,$01
+0B96: 80           ADD A,B
+0B97: 47           LD B,A
+0B98: CD 00 0C     CALL $0C00
+
+0B9B: F0 B5        PUSH AF
+0B9D: CB 7F        BIT 7,A
+0B9F: 20 07        JR NZ,$0BA8      ; Jump if bit 7 = 1
+0BA1: 3E 07        LD A,$07
+0BA3: 80           ADD A,B
+0BA4: 47           LD B,A
+0BA5: C3 14 0B     JP $0B14
+0BA8: CD 00 0C     CALL $0C00
+0BAB: CB 20        SLA B            ; Shift B left arithmetic
+
+0BAD: F0 B5        PUSH AF
+0BAF: CB 7F        BIT 7,A
+0BB1: 28 04        JR Z,$0BB7       ; Jump if bit 7 = 0
+0BB3: 3E 01        LD A,$01
+0BB5: 80           ADD A,B
+0BB6: 47           LD B,A
+0BB7: CD 00 0C     CALL $0C00
+
+0BBA: F0 B5        PUSH AF
+0BBC: CB 7F        BIT 7,A
+0BBE: 20 07        JR NZ,$0BC7      ; Jump if bit 7 = 1
+0BC0: 3E 0F        LD A,$0F
+0BC2: 80           ADD A,B
+0BC3: 47           LD B,A
+0BC4: C3 14 0B     JP $0B14
+0BC7: CD 00 0C     CALL $0C00
+0BCA: CB 20        SLA B            ; Shift B left arithmetic
+
+0BCC: F0 B5        PUSH AF
+0BCE: CB 7F        BIT 7,A
+0BD0: 28 04        JR Z,$0BD6       ; Jump if bit 7 = 0
+0BD2: 3E 01        LD A,$01
+0BD4: 80           ADD A,B
+0BD5: 47           LD B,A
+0BD6: CD 00 0C     CALL $0C00
+
+0BD9: F0 B5        PUSH AF
+0BDB: CB 7F        BIT 7,A
+0BDD: 20 07        JR NZ,$0BE6      ; Jump if bit 7 = 1
+0BDF: 3E 1F        LD A,$1F
+0BE1: 80           ADD A,B
+0BE2: 47           LD B,A
+0BE3: C3 14 0B     JP $0B14
+0BE6: CD 00 0C     CALL $0C00
+0BE9: CB 20        SLA B            ; Shift B left arithmetic
+
+0BEB: F0 B5        PUSH AF
+0BED: CB 7F        BIT 7,A
+0BEF: 28 04        JR Z,$0BF5       ; Jump if bit 7 = 0
+0BF1: 3E 01        LD A,$01
+0BF3: 80           ADD A,B
+0BF4: 47           LD B,A
+0BF5: CD 00 0C     CALL $0C00
+0BF8: CB 20        SLA B            ; Shift B left arithmetic
+
+0BFA: F0 B5        PUSH AF
+0BFC: CB 7F        BIT 7,A
+0BFE: 28 04        JR Z,$0C04       ; Jump if bit 7 = 0
+0C00: 3E 01        LD A,$01
+0C02: 80           ADD A,B
+0C03: 47           LD B,A
+0C04: 3E 3F        LD A,$3F
+0C06: 80           ADD A,B
+0C07: 47           LD B,A
+0C08: C3 14 0B     JP $0B14
+0C0B: 2A 4F E0     ???              ; Possibly data, not valid opcodes
+
+
+--- 0x0C00 ---
+0C00: F0 B4        LD A,[$FF00+$B4]  ; Load from HRAM
+0C02: CB 27        SLA A              ; Shift A left arithmetic (multiply by 2)
+0C04: E0 B4        LD [$FF00+$B4],A   ; Store back to HRAM
+0C06: F0 B5        LD A,[$FF00+$B5]  ; Load from HRAM
+0C08: CB 17        RL A               ; Rotate A left through carry
+0C0A: E0 B5        LD [$FF00+$B5],A   ; Store back to HRAM
+0C0C: F0 B6        LD A,[$FF00+$B6]  ; Load from HRAM
+0C0E: 3D           DEC A              ; Decrement A
+0C0F: E0 B6        LD [$FF00+$B6],A   ; Store back to HRAM
+0C11: C0           RET NZ             ; Return if not zero
+0C12: 18 0B        JR $0C1F           ; Jump to $0C1F (within $0C14 routine)
+
+
+--- 0x0C14 ---
+0C14: F0 B2        LD A,[$FF00+$B2]  ; Load from HRAM
+0C16: 91           SUB C              ; Subtract C
+0C17: E0 B2        LD [$FF00+$B2],A   ; Store back to HRAM
+0C19: F0 B3        LD A,[$FF00+$B3]  ; Load from HRAM
+0C1B: 98           SBC B              ; Subtract B with borrow
+0C1C: E0 B3        LD [$FF00+$B3],A   ; Store back to HRAM
+0C1E: C9           RET                ; Return
+
+--- 0x0BFB ---
+0BFB: 2A           LDI A,(HL)         ; Load A from HL, increment HL
+0BFC: 4F           LD C,A             ; Store in C
+0BFD: E0 B7        LD [$FF00+$B7],A   ; Store in HRAM
+0BFF: C9           RET                ; Return
+
+--- 0x0C2A ---
+0C2A: F0 B5        LD A,[$FF00+$B5]  ; Load from HRAM
+0C2C: CB 7F        BIT 7,A            ; Test bit 7
+0C2E: 28 06        JR Z,$0C36         ; Jump if bit 7 = 0
+0C30: 01 03 00     LD BC,$0003        ; BC = 3
+0C33: C3 C6 0C     JP $0CC6           ; Jump to $0CC6 (not in provided range)
+0C36: CD 00 0C     CALL $0C00         ; Call $0C00
+
+0C39: F0 B5        LD A,[$FF00+$B5]  ; Load from HRAM
+0C3B: CB 7F        BIT 7,A
+0C3D: 28 06        JR Z,$0C45
+0C3F: 01 04 00     LD BC,$0004        ; BC = 4
+0C42: C3 C6 0C     JP $0CC6
+0C45: CD 00 0C     CALL $0C00
+
+0C48: F0 B5        LD A,[$FF00+$B5]
+0C4A: CB 7F        BIT 7,A
+0C4C: 28 06        JR Z,$0C54
+0C4E: 01 05 00     LD BC,$0005        ; BC = 5
+0C51: C3 C6 0C     JP $0CC6
+0C54: CD 00 0C     CALL $0C00
+
+0C57: F0 B5        LD A,[$FF00+$B5]
+0C59: CB 7F        BIT 7,A
+0C5B: 28 06        JR Z,$0C63
+0C5D: 01 06 00     LD BC,$0006        ; BC = 6
+0C60: C3 C6 0C     JP $0CC6
+0C63: CD 00 0C     CALL $0C00
+
+0C66: F0 B5        LD A,[$FF00+$B5]
+0C68: CB 7F        BIT 7,A
+0C6A: 28 15        JR Z,$0C81
+0C6C: CD 00 0C     CALL $0C00
+
+0C6F: F0 B5        LD A,[$FF00+$B5]
+0C71: CB 7F        BIT 7,A
+0C73: 28 06        JR Z,$0C7B
+0C75: 01 08 00     LD BC,$0008        ; BC = 8
+0C78: C3 C6 0C     JP $0CC6
+0C7B: 01 07 00     LD BC,$0007        ; BC = 7
+0C7E: C3 C6 0C     JP $0CC6
+0C81: CD 00 0C     CALL $0C00
+
+0C84: F0 B5        LD A,[$FF00+$B5]
+0C86: CB 7F        BIT 7,A
+0C88: 20 30        JR NZ,$0CBA        ; Jump if bit 7 = 1
+0C8A: CD 00 0C     CALL $0C00
+0C8D: 01 00 00     LD BC,$0000        ; BC = 0
+
+; Series of bit tests adding values to C
+0C90: F0 B5        LD A,[$FF00+$B5]
+0C92: CB 7F        BIT 7,A
+0C94: 28 04        JR Z,$0C9A
+0C96: 3E 04        LD A,$04
+0C98: 81           ADD A,C
+0C99: 4F           LD C,A
+0C9A: CD 00 0C     CALL $0C00
+
+0C9D: F0 B5        LD A,[$FF00+$B5]
+0C9F: CB 7F        BIT 7,A
+0CA1: 28 04        JR Z,$0CA7
+0CA3: 3E 02        LD A,$02
+0CA5: 81           ADD A,C
+0CA6: 4F           LD C,A
+0CA7: CD 00 0C     CALL $0C00
+
+0CAA: F0 B5        LD A,[$FF00+$B5]
+0CAC: CB 7F        BIT 7,A
+0CAE: 28 04        JR Z,$0CB4
+0CB0: 3E 01        LD A,$01
+0CB2: 81           ADD A,C
+0CB3: 4F           LD C,A
+0CB4: 3E 09        LD A,$09
+0CB6: 81           ADD A,C
+0CB7: 4F           LD C,A
+0CB8: 18 0C        JR $0CC6
+
+0CBA: 2A           LDI A,(HL)         ; Load from HL
+0CBB: 4F           LD C,A
+0CBC: 06 00        LD B,$00
+0CBE: 3E 11        LD A,$11
+0CC0: 81           ADD A,C
+0CC1: 4F           LD C,A
+0CC2: 3E 00        LD A,$00
+0CC4: 88           ADC A,B
+0CC5: 47           LD B,A
+
+0CC6: 79           LD A,C             ; Store BC in HRAM
+0CC7: E0 B8        LD [$FF00+$B8],A
+0CC9: 78           LD A,B
+0CCA: E0 B9        LD [$FF00+$B9],A
+0CCC: C9           RET                ; Return
+
