@@ -1,0 +1,51 @@
+-- Convert provided text into hex C array
+vim.api.nvim_create_user_command('Str2Arr', function(opts)
+    local lookup = {
+        [string.byte('A')]=0xa0,[string.byte('B')]=0xa1,[string.byte('C')]=0xa2,[string.byte('D')]=0xa3,
+        [string.byte('E')]=0xa4,[string.byte('F')]=0xa5,[string.byte('G')]=0xa6,[string.byte('H')]=0xa7,
+        [string.byte('I')]=0xa8,[string.byte('J')]=0xa9,[string.byte('K')]=0xaa,[string.byte('L')]=0xab,
+        [string.byte('M')]=0xac,[string.byte('N')]=0xad,[string.byte('O')]=0xae,[string.byte('P')]=0xaf,
+        [string.byte('Q')]=0xb0,[string.byte('R')]=0xb1,[string.byte('S')]=0xb2,[string.byte('T')]=0xb3,
+        [string.byte('U')]=0xb4,[string.byte('V')]=0xb5,[string.byte('W')]=0xb6,[string.byte('X')]=0xb7,
+        [string.byte('Y')]=0xb8,[string.byte('Z')]=0xb9,
+        [string.byte('&')]=0xbb,[string.byte('"')]=0xbc,[string.byte('(')]=0xbe,[string.byte(')')]=0xbf,
+        [string.byte('0')]=0xc0,[string.byte('1')]=0xc1,[string.byte('2')]=0xc2,[string.byte('3')]=0xa3,
+        [string.byte('4')]=0xc4,[string.byte('5')]=0xc5,[string.byte('6')]=0xc6,[string.byte('7')]=0xc7,
+        [string.byte('8')]=0xc8,[string.byte('9')]=0xc9,[string.byte('/')]=0xca,[string.byte('-')]=0xcb,
+        [string.byte('%')]=0xcc,[string.byte(':')]=0xcd,[string.byte('?')]=0xce,[string.byte('!')]=0xcf,
+        [string.byte('+')]=0xd8,[string.byte(',')]=0xd9,[string.byte('.')]=0xda,[string.byte('_')]=0xdd,
+        [string.byte('@')]=0xf1,[string.byte('^')]=0xf8,[string.byte('#')]=0xf9,[string.byte('~')]=0xfa,
+        [string.byte('\'')]=0xdc,[string.byte('<')]=0xd0,[string.byte('>')]=0xd1,[string.byte('$')]=0xe2,
+        [string.byte('}')]=0xe4
+    }
+
+    local spcchr  = opts.fargs[1]
+    local fillchr = opts.fargs[2]
+    local len     = tonumber(opts.fargs[3])
+    local text_start = len and 4 or 3
+    local str = table.concat(opts.fargs," ",text_start):upper()
+    if not len then len = #str end
+    local lines={{}}
+    local line=1
+    local function emit(x) lines[line][#lines[line]+1]=x end
+    local function newline() line=line+1; lines[line]={} end
+
+    for i=1,len do
+        local byte=str:byte(i)
+        if not byte then emit(fillchr..",")
+        elseif byte==0x20 then emit(spcchr..",")
+        elseif byte==0x7c then emit("0xf0,"); newline()
+        elseif byte==0x2a then emit("0xf3,"); emit("0xf4,"); newline()
+        elseif lookup[byte] then emit(string.format("0x%02x,",lookup[byte]))
+        else emit(spcchr..",") end
+    end
+
+    emit("0xff")
+
+    local out={}
+    for i,l in ipairs(lines) do out[i]=table.concat(l," ") end
+    vim.api.nvim_put(out,"c",true,true)
+end, {nargs="+"})
+
+vim.keymap.set('n','<leader>a',function() vim.api.nvim_feedkeys( vim.api.nvim_replace_termcodes(':Str2Arr 0xef 0xef ',true,false,true),'t', false ) end,{silent=true})
+
