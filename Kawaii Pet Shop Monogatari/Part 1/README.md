@@ -22,3 +22,10 @@ Control chars are:
 - F8 - ^ - player name.
 - F9 - # - number.
 - FA - ~ - animal kind, item name.
+
+**To use patcher:**
+- change path defined in ROM_PATH inside rom_patcher.c
+- compile with ```gcc rom_patcher.c -o rom_patcher```
+- run ```./rom_patcher```
+
+**Rom:** c8ff99c216603ff09733bb4f80e2bc61 Kawaii Pet Shop Monogatari (J) (GB) \[!\].gbc
